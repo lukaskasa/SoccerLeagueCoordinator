@@ -1,20 +1,11 @@
 
 /*
  
-** Part 1: ** We have provided information for the 18 players in the Player Info spreadsheet. Please choose an appropriate data type to store the information for each player. In addition, create an empty collection constant to hold all the players’ data. Once you have decided on what tools to use, manually enter the player data so it can be used in Part 2.
+ Author: Lukas Kasakaitis
  
 */
 
-/*
- 
- ** Part 2: ** Create logic to iterate through all 18 players and assign them to teams such that the number of experienced players on each team are the same. Store each team’s players in its own collection for use in Part 3. Please note: your logic should work correctly regardless of the initial ordering of the players and the number of players. This solution should work if there are 18 players or 100.
- 
- Also, if you would like to attain an “exceeds expectations” rating for this project, write code to ensure that each team's average height is within 1.5 inches of the others.
- 
- */
-
-// Soccer League Players
-
+// Dictionary to store Soccer League Players
 let players : [String : [String : Any]] = [
     "Joe Smith" : ["Height": 42.0, "Experience": true, "Guardians": "Jim and Jan Smith"],
     "Jill Tanner" : ["Height": 36.0, "Experience": true, "Guardians": "Clara Tanner"],
@@ -35,19 +26,8 @@ let players : [String : [String : Any]] = [
     "Les Clay" : ["Height": 42.0, "Experience": true, "Guardians": "Wynonna Brown"],
     "Herschel Krustofski" : ["Height": 45.0, "Experience": true, "Guardians": "Hyman and Rachel Krustofski"]
 ]
-//
-//"Lukas Kasakaitis" : ["Height": 43.0, "Experience": true, "Guardians": "Edmundas and Janina Kasakaitis"],
-//"David Kasakaitis" : ["Height": 46.0, "Experience": true, "Guardians": "Edmundas and Janina Kasakaitis"],
-//"Artur Stankewizius" : ["Height": 42.0, "Experience": true, "Guardians": "Algimantas and Regina Stankewizius"],
-//"Lukas Kasakaitis2" : ["Height": 43.0, "Experience": true, "Guardians": "Edmundas and Janina Kasakaitis"],
-//"David Kasakaitis2" : ["Height": 46.0, "Experience": true, "Guardians": "Edmundas and Janina Kasakaitis"],
-//"Artur Stankewizius2" : ["Height": 42.0, "Experience": true, "Guardians": "Algimantas and Regina Stankewizius"],
-//"Lukas Kasakaitis3" : ["Height": 43.0, "Experience": true, "Guardians": "Edmundas and Janina Kasakaitis"],
-//"David Kasakaitis3" : ["Height": 46.0, "Experience": true, "Guardians": "Edmundas and Janina Kasakaitis"],
-//"Artur Stankewizius3" : ["Height": 42.0, "Experience": true, "Guardians": "Algimantas and Regina Stankewizius"]
 
 // Function to Calculate Number of Experienced Players
-
 func numberOfExperienced(_ players: [String: [String: Any]]) -> Int {
     var numberOfExperiencedPlayers = 0
     
@@ -126,49 +106,52 @@ func filterPlayers(experienced: Bool, _ players: [String : [String : Any]]) -> [
 // Function to devide players into teams
 
 func divideInto(teamNames: [String], with players: [String : [String : Any]]) -> [String : [String: [String: Any]]] {
-    
     let playersPerTeam = players.count / teamNames.count
     let experiencedPlayersPerTeam = numberOfExperienced(players) / teamNames.count
     
     var playerSets = [filterPlayers(experienced: true, players), filterPlayers(experienced: false, players)]
     var teams = [String : [String: [String: Any]]]()
-    var nextPlayer = [String: [String: Any]]()
+    var tallestPlayer = [String: [String: Any]]()
     var tallestPlayerHeight = Double()
     
+    // Create the number of dictionaries as there are teams
     for i in 0..<teamNames.count {
         teams[teamNames[i]] = [:]
     }
     
     var index : Int = 0
     
+    // Continue to loop until dictionaries are empty
     while playerSets[0].count > 0 && playerSets[1].count > 0 {
         
         for set in playerSets {
             for player in set {
-                
+                // Retrieve the tallest player first
                 let playerHeight =  player.value["Height"] as! Double
                 
-                if nextPlayer.count < 1 {
-                    nextPlayer[player.key] = player.value
-                    tallestPlayerHeight = nextPlayer.first?.value["Height"] as! Double
+                if tallestPlayer.count < 1 {
+                    tallestPlayer[player.key] = player.value
+                    tallestPlayerHeight = tallestPlayer.first?.value["Height"] as! Double
                 } else if playerHeight > tallestPlayerHeight {
-                    nextPlayer.removeAll()
-                    nextPlayer[player.key] = player.value
-                    tallestPlayerHeight = nextPlayer.first?.value["Height"] as! Double
+                    tallestPlayer.removeAll()
+                    tallestPlayer[player.key] = player.value
+                    tallestPlayerHeight = tallestPlayer.first?.value["Height"] as! Double
                 }
             }
             
-            if isExperienced(nextPlayer.first!.value) && numberOfExperienced(teams[teamNames[index]]!) != experiencedPlayersPerTeam {
-                teams[teamNames[index]]!.updateValue(nextPlayer.first!.value, forKey: nextPlayer.first!.key)
-                playerSets[0].removeValue(forKey: nextPlayer.first!.key)
-                nextPlayer.removeAll()
+            // Tallest players get into the team first
+            if isExperienced(tallestPlayer.first!.value) && numberOfExperienced(teams[teamNames[index]]!) != experiencedPlayersPerTeam {
+                teams[teamNames[index]]!.updateValue(tallestPlayer.first!.value, forKey: tallestPlayer.first!.key)
+                playerSets[0].removeValue(forKey: tallestPlayer.first!.key)
+                tallestPlayer.removeAll()
             } else if teams[teamNames[index]]!.count != playersPerTeam {
-                teams[teamNames[index]]!.updateValue(nextPlayer.first!.value, forKey: nextPlayer.first!.key)
-                playerSets[1].removeValue(forKey: nextPlayer.first!.key)
-                nextPlayer.removeAll()
+                teams[teamNames[index]]!.updateValue(tallestPlayer.first!.value, forKey: tallestPlayer.first!.key)
+                playerSets[1].removeValue(forKey: tallestPlayer.first!.key)
+                tallestPlayer.removeAll()
             }
         }
        
+        // Increase Index in order to distrubute players evenly
         if index == teamNames.count - 1 {
             index = 0
         } else {
@@ -180,27 +163,82 @@ func divideInto(teamNames: [String], with players: [String : [String : Any]]) ->
     return teams
 }
 
-var teams = divideInto(teamNames: ["teamSharks", "teamDragons", "teamRaptors"], with: players)
 
-var teamSharks = teams["teamSharks"]
-var teamDragons = teams["teamDragons"]
-var teamRaptors = teams["teamRaptors"]
+// Function to create letters which returns an Array of Strings
+func writeLetterTo(_ teams: [String : [String : [String : Any]]]) -> [String] {
+    var letters = [String]()
+    var letter : String = ""
+    var practiceTime : String = ""
+    
+    for team in teams {
+        let teamName = team.key
+        
+        if teamName == "Dragons" {
+            practiceTime = "March 17, 1pm"
+        } else if teamName == "Sharks" {
+            practiceTime = "March 17, 3pm"
+        }else {
+            practiceTime = "March 18, 1pm"
+        }
+        
+        for player in team.value {
+            let guardians = player.value["Guardians"]!
+            let playerName = player.key
+            
+            letter = "Dear \(guardians), \n your child \(playerName) has been selected by team \(teamName). Practice starts on \(practiceTime). We are excited to meet \(playerName) \n Best Regards \n Team \(teamName)"
+            
+            letters.append(letter)
+        }
+    }
 
+    
+    return letters
+}
+
+
+// Function to print all letters to the Console
+func printLetters(letters: [String]) -> Void {
+    for letter in letters {
+        print("\n")
+        print(letter)
+    }
+}
+
+
+//Print All teeam
+
+var teams = divideInto(teamNames: ["Sharks", "Dragons", "Raptors"], with: players)
+
+var teamSharks = teams["Sharks"]
+var teamDragons = teams["Dragons"]
+var teamRaptors = teams["Raptors"]
 
 if let team = teamSharks {
-    print(team)
-    let teamSharksHeightAverage = averageHeightOf(team)
-    print(teamSharksHeightAverage)
+    print("Sharks: \(team)")
+    print("\n")
+    print("Sharks height average: \(averageHeightOf(team))")
+    print("\n")
 }
 
 if let team = teamDragons {
-    print(team)
-    let teamDragonsHeightAverage = averageHeightOf(team)
-    print(teamDragonsHeightAverage)
+    print("Dragons: \(team)")
+    print("\n")
+    print("Dragons height average: \(averageHeightOf(team))")
+    print("\n")
 }
 
 if let team = teamRaptors {
-    print(team)
-    let teamRaptorsHeightAverage = averageHeightOf(team)
-    print(teamRaptorsHeightAverage)
+    print("Raptors: \(team)")
+    print("\n")
+    print("Raptors height average: \(averageHeightOf(team))")
+    print("\n")
 }
+
+let letters = writeLetterTo(teams)
+
+printLetters(letters: letters)
+
+
+
+
+
