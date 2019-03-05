@@ -26,15 +26,9 @@ let arnoldWillis: [String: Any] = ["name": "Arnold Willis", "height": 43.0, "isE
 let phillipHelm: [String: Any] = ["name": "Phillip Helm", "height": 43.0, "isExperienced": true, "guardians": "Claire Willis"]
 let lesClay: [String: Any] = ["name": "Les Clay", "height": 42.0, "isExperienced": true, "guardians": "Wynonna Brown"]
 let herschelKrustofski: [String: Any] = ["name": "Herschel Krustofski", "height": 45.0, "isExperienced": true, "guardians": "Hyman and Rachel Krustofski"]
-let lukas: [String: Any] = ["name": "Leerfs Clay2", "height": 45.2, "isExperienced": true, "guardians": "rree Brown"]
-let lukas2: [String: Any] = ["name": "Herscefhel fereee", "height": 41.4, "isExperienced": true, "guardians": "Hyman and rrRachel Krustofski"]
-let lukas3: [String: Any] = ["name": "Herschwel Krustofski2", "height": 43.0, "isExperienced": true, "guardians": "Hyman andeeRachel Krustofski"]
-let lukas4: [String: Any] = ["name": "Leerfs Clay2", "height": 46.0, "isExperienced": true, "guardians": "rree Brown"]
-let lukas5: [String: Any] = ["name": "Herscewfhel fereee", "height": 41.7, "isExperienced": true, "guardians": "Hyman and rrRachel Krustofski"]
-let lukas6: [String: Any] = ["name": "Herschel Krustofswki2", "height": 43.4, "isExperienced": true, "guardians": "Hyman andeeRachel Krustofski"]
 
 // Array to hold all players
-let players = [joeSmith, jillTanner, billBon, evaGordon, mattGill, kimmyStein, sammyAdams, karlSaygan, suzanneGreenberg, salDali, joeKavalier, benFinkelstein, diegoSoto, chloeAlaska, arnoldWillis, phillipHelm, lesClay, herschelKrustofski, lukas, lukas2, lukas3, lukas4, lukas5, lukas6]
+let players = [joeSmith, jillTanner, billBon, evaGordon, mattGill, kimmyStein, sammyAdams, karlSaygan, suzanneGreenberg, salDali, joeKavalier, benFinkelstein, diegoSoto, chloeAlaska, arnoldWillis, phillipHelm, lesClay, herschelKrustofski]
 
 // Function to calculate number of experienced players
 
