@@ -23,7 +23,7 @@ let benFinkelstein: [String: Any] = ["name": "Ben Finkelstein", "height": 44.0, 
 let diegoSoto: [String: Any] = ["name": "Diego Soto", "height": 41.0, "isExperienced": true, "guardians": "Robin and Sarika Soto"]
 let chloeAlaska: [String: Any] = ["name": "Chloe Alaska", "height": 47.0, "isExperienced": false, "guardians": "David and Jamie Alaska"]
 let arnoldWillis: [String: Any] = ["name": "Arnold Willis", "height": 43.0, "isExperienced": false, "guardians": "Claire Willis"]
-let phillipHelm: [String: Any] = ["name": "Phillip Helm", "height": 43.0, "isExperienced": true, "guardians": "Claire Willis"]
+let phillipHelm: [String: Any] = ["name": "Phillip Helm", "height": 44.0, "isExperienced": true, "guardians": "Thomas Helm and Eva Jones"]
 let lesClay: [String: Any] = ["name": "Les Clay", "height": 42.0, "isExperienced": true, "guardians": "Wynonna Brown"]
 let herschelKrustofski: [String: Any] = ["name": "Herschel Krustofski", "height": 45.0, "isExperienced": true, "guardians": "Hyman and Rachel Krustofski"]
 
