@@ -1,11 +1,10 @@
-
 /*
  
  Soccer League Coordinator - Project 1 - Tech Degree
  Author: Lukas Kasakaitis
- 05.03.2019
+ 08.03.2019
  
-*/
+ */
 
 // Dictionaries for each player
 let joeSmith: [String: Any] = ["name": "Joe Smith", "height": 42.0, "isExperienced": true, "guardians": "Jim and Jan Smith"]
@@ -30,40 +29,13 @@ let herschelKrustofski: [String: Any] = ["name": "Herschel Krustofski", "height"
 // Array to hold all players
 let players = [joeSmith, jillTanner, billBon, evaGordon, mattGill, kimmyStein, sammyAdams, karlSaygan, suzanneGreenberg, salDali, joeKavalier, benFinkelstein, diegoSoto, chloeAlaska, arnoldWillis, phillipHelm, lesClay, herschelKrustofski]
 
-// Function to calculate number of experienced players
-
-func numberOfExperienced(_ players: [[String: Any]]) -> Int {
-    var numberOfExperiencedPlayers = 0
-    
-    for player in players {
-        if isExperienced(player) {
-            numberOfExperiencedPlayers += 1
-        }
-    }
-    
-    return numberOfExperiencedPlayers
-}
-
-// Function to find out if player is experienced
-
-func isExperienced(_ player: [String : Any]) -> Bool {
-    guard let withExperience = player["isExperienced"] as? Bool else { return false }
-    
-    if withExperience {
-        return true
-    } else {
-        return false
-    }
-}
-
 // Function to calculate average height
-
 func averageHeightOf(_ team: [[String : Any]]) -> Double {
     var averageHeight : Double = 0.0
     
     for player in team {
         if let height = player["height"] as? Double {
-         averageHeight += height
+            averageHeight += height
         }
     }
     
@@ -73,44 +45,83 @@ func averageHeightOf(_ team: [[String : Any]]) -> Double {
     }
 }
 
-// Function to seperate Experienced from inexperienced
 
-func filterPlayers(experienced: Bool, _ players: [[String : Any]]) -> [[String : Any]] {
-    var players = players
-    var sortedPlayers = [[String : Any]]()
+// Function to calculate number of experienced players
+func numberOfExperienced(_ players: [[String: Any]]) -> Int {
+    var numberOfExperiencedPlayers = 0
     
     for player in players {
+        guard let isExperienced = player["isExperienced"] as? Bool else { break }
+        if isExperienced {
+            numberOfExperiencedPlayers += 1
+        }
+    }
+    
+    return numberOfExperiencedPlayers
+}
+
+// Function to get experienced players
+func getExperienced(_ players: [[String : Any]]) -> [[String : Any]] {
+    var experiencedPlayers = [[String : Any]]()
+    
+    for player in players {
+        guard let isExperienced = player["isExperienced"] as? Bool else { break }
         
-        guard let name = player["name"] as? String else { fatalError("name: String not found!") }
+        if isExperienced {
+            experiencedPlayers.append(player)
+        }
+    }
+    return experiencedPlayers
+}
+
+// Function to get experienced players
+func getInExperienced(_ players: [[String : Any]]) -> [[String : Any]] {
+    var inExperiencedPlayers = [[String : Any]]()
+    
+    for player in players {
+        guard let isExperienced = player["isExperienced"] as? Bool else { break }
         
-        if experienced && isExperienced(player) {
-            sortedPlayers.append(player)
-            players.removeAll {element in
-                guard let playerToBeRemoved = element["name"] as? String else { fatalError("name: String not found!") }
-                return playerToBeRemoved == name
+        if !isExperienced {
+            inExperiencedPlayers.append(player)
+        }
+    }
+    return inExperiencedPlayers
+}
+
+// Function to get tallest Player
+func getTallest(from players: [[String : Any]]) -> [String: Any] {
+    var tallestPlayer = [String: Any]()
+    var tallestPlayerHeight = Double()
+    
+    for player in players {
+        // Retrieve the tallest player first
+        guard let playerHeight = player["height"] as? Double else { fatalError("Player Height is not a Double!") }
+        // if array is emty add it to the array
+        if tallestPlayer.count < 1 {
+            tallestPlayer = player
+            if let height = tallestPlayer["height"] as? Double {
+                tallestPlayerHeight = height
             }
-        } else if !experienced && !isExperienced(player){
-            sortedPlayers.append(player)
-            players.removeAll {element in
-                guard let playerToBeRemoved = element["name"] as? String else { fatalError("name: String not found!") }
-                return playerToBeRemoved == name
+            // if current player in loop is taller replace the tallestPlayer
+        } else if playerHeight > tallestPlayerHeight {
+            tallestPlayer.removeAll()
+            tallestPlayer = player
+            if let height = tallestPlayer["height"] as? Double {
+                tallestPlayerHeight = height
             }
         }
     }
     
-    return sortedPlayers
+    return tallestPlayer
 }
 
 // Function to devide players into teams by number of team names
-
 func divideInto(teamNames: [String], with players: [[String : Any]]) -> [String : [[String: Any]]] {
     let playersPerTeam = players.count / teamNames.count
-    let experiencedPlayersPerTeam = numberOfExperienced(players) / teamNames.count
-    
-    var playerSets = [filterPlayers(experienced: true, players), filterPlayers(experienced: false, players)]
+    var inExperiencedPlayers = getInExperienced(players)
+    var experiencedPlayers = getExperienced(players)
+    let experiencedPlayersPerTeam = experiencedPlayers.count / teamNames.count
     var teams = [String: [[String: Any]] ]()
-    var tallestPlayer = [[String: Any]]()
-    var tallestPlayerHeight = Double()
     
     // Create the number of dictionaries as there are teams
     for i in 0..<teamNames.count {
@@ -119,63 +130,46 @@ func divideInto(teamNames: [String], with players: [[String : Any]]) -> [String 
     
     var index : Int = 0
     
-    // Continue to loop until all players have been assigned to a team
-    while playerSets[0].count > 0 && playerSets[1].count > 0 {
+    // Put experienced players into teams
+    while experiencedPlayers.count > 0 {
+        let tallestPlayer = getTallest(from: experiencedPlayers)
+        guard let name = tallestPlayer["name"] as? String else { fatalError("name: String not found!") }
+        guard let team = teams[teamNames[index]] else { fatalError("Team was not Found") }
+        
+        if numberOfExperienced(team) != experiencedPlayersPerTeam {
+            teams[teamNames[index]]?.append(tallestPlayer)
+            experiencedPlayers.removeAll { element in
+                guard let playerToBeRemoved = element["name"] as? String else { fatalError("name: String not found!") }
+                return playerToBeRemoved == name
+            }
+        }
+        if index == teamNames.count - 1 {
+            index = 0
+        } else {
+            index += 1
+        }
+    }
     
-        for set in playerSets {
-            
-            for player in set {
-                // Retrieve the tallest player first
-                guard let playerHeight = player["height"] as? Double else { fatalError("Player Height is not a Double!") }
-                // if array is emty add it to the array
-                if tallestPlayer.count < 1 {
-                    tallestPlayer.append(player)
-                    if let height = tallestPlayer[0]["height"] as? Double {
-                        tallestPlayerHeight = height
-                    }
-                    // if current player in loop is taller replace the tallestPlayer
-                } else if playerHeight > tallestPlayerHeight {
-                    tallestPlayer.removeAll()
-                    tallestPlayer.append(player)
-                    if let height = tallestPlayer[0]["height"] as? Double {
-                        tallestPlayerHeight = height
-                    }
-                }
+    // Swap index to distrbute players more evenly
+    index = teamNames.count - 1
+    
+    // Put in experienced players into teams
+    while inExperiencedPlayers.count > 0 {
+        let tallestPlayer = getTallest(from: inExperiencedPlayers)
+        guard let name = tallestPlayer["name"] as? String else { fatalError("name: String not found!") }
+        guard let team = teams[teamNames[index]] else { fatalError("Team was not Found") }
+        
+        if team.count != playersPerTeam {
+            teams[teamNames[index]]?.append(tallestPlayer)
+            inExperiencedPlayers.removeAll { element in
+                guard let playerToBeRemoved = element["name"] as? String else { fatalError("name: String not found!") }
+                return playerToBeRemoved == name
             }
-            
-            guard let name = tallestPlayer[0]["name"] as? String else { fatalError("name: String not found!") }
-            guard let team = teams[teamNames[index]] else { fatalError("Team was not Found") }
-            
-            // Tallest players get into the team first
-            if isExperienced(tallestPlayer[0]) && numberOfExperienced(team) != experiencedPlayersPerTeam {
-                if teams[teamNames[index]] != nil {
-                    teams[teamNames[index]]?.append(tallestPlayer[0])
-                }
-                // Remove player from collection once it has been assigned
-                playerSets[0].removeAll {element in
-                    guard let playerToBeRemoved = element["name"] as? String else { fatalError("name: String not found!") }
-                    return playerToBeRemoved == name
-                }
-                tallestPlayer.removeAll()
-            } else if !isExperienced(tallestPlayer[0]) && teams[teamNames[index]]!.count != playersPerTeam {
-                if teams[teamNames[index]] != nil {
-                    teams[teamNames[index]]?.append(tallestPlayer[0])
-                }
-                // Remove player from collection once it has been assigned
-                playerSets[1].removeAll { element in
-                    guard let playerToBeRemoved = element["name"] as? String else { fatalError("name: String not found!") }
-                    return playerToBeRemoved == name
-                }
-                
-                tallestPlayer.removeAll()
-            }
-            
-            // Increase Index in order to distrubute players evenly between the teams to achieve an even height distribution
-            if index == teamNames.count - 1 {
-                index = 0
-            } else {
-                index += 1
-            }
+        }
+        if index == 0 {
+            index = teamNames.count - 1
+        } else {
+            index -= 1
         }
     }
     
@@ -183,7 +177,6 @@ func divideInto(teamNames: [String], with players: [[String : Any]]) -> [String 
 }
 
 // Function to create letters which returns an Array of Strings
-
 func writeLetterTo(_ teams: [String : [[String : Any]]]) -> [String] {
     var letters = [String]()
     var letter = String()
@@ -203,9 +196,9 @@ func writeLetterTo(_ teams: [String : [[String : Any]]]) -> [String] {
         for player in team.value {
             guard let guardians = player["guardians"] as? String else { fatalError("guardians: String not found!") }
             guard let playerName = player["name"] as? String else { fatalError("name: String not found!") }
-
+            
             letter = "Dear \(guardians), \n your child \(playerName) has been selected by team \(teamName). Practice starts on \(practiceTime). We are excited to meet \(playerName) \n Best Regards \n Team \(teamName)"
-
+            
             letters.append(letter)
         }
     }
@@ -214,7 +207,6 @@ func writeLetterTo(_ teams: [String : [[String : Any]]]) -> [String] {
 }
 
 // Function to print all letters to the Console
-
 func printLetters(letters: [String]) -> Void {
     for letter in letters {
         print("\n")
@@ -223,29 +215,31 @@ func printLetters(letters: [String]) -> Void {
 }
 
 var teams = divideInto(teamNames: ["Sharks", "Dragons", "Raptors"], with: players)
+guard let teamSharks = teams["Sharks"] else { fatalError("Team Sharks doesn't exist!") }
+guard let teamDragons = teams["Dragons"] else { fatalError("Team Dargons doesn't exist!") }
+guard let teamRaptors = teams["Raptors"] else { fatalError("Team Raptors doesn't exist!") }
 
-if let team = teams["Sharks"] {
-    print("Sharks: \(team)")
-    print("\n")
-    print("Sharks height average: \(averageHeightOf(team))")
-    print("\n")
-}
 
-if let team = teams["Dragons"] {
-    print("Dragons: \(team)")
-    print("\n")
-    print("Dragons height average: \(averageHeightOf(team))")
-    print("\n")
-}
+// Print Team Sharks
+print("Sharks: \(teamSharks)")
+print("\n")
+print("Team Sharks height average: \(averageHeightOf(teamSharks))")
+print("\n")
 
-if let team = teams["Raptors"] {
-    print("Raptors: \(team)")
-    print("\n")
-    print("Raptors height average: \(averageHeightOf(team))")
-    print("\n")
-}
+// Print Team Dragons
+print("Dragons: \(teamDragons)")
+print("\n")
+print("Team Dragons height average: \(averageHeightOf(teamDragons))")
+print("\n")
+
+// Print Team Raptors
+print("Raptors: \(teamRaptors)")
+print("\n")
+print("Team Raptors height average: \(averageHeightOf(teamRaptors))")
+print("\n")
+
 
 let letters = writeLetterTo(teams)
 //Print All teams and Height Averages
+print("---Letters---")
 printLetters(letters: letters)
-
