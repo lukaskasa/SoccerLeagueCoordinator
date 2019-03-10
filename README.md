@@ -1,2 +1,2 @@
-# soccerleaguecoordinator
-Soccer League Coordinator - Treehouse Project Unit 1
+# Soccer League Coordinator
+Soccer League Coordinator - Treehouse Tech Degree Project Unit 1
